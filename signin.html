@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👀</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- CSS: page styles -->
+<style>
+  :root {
+    --ink: #14213d; --muted: #6b7690; --line: #d9dff0;
+    --blue: #3b6cf0; --blue-dark: #2a52c9;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #fff; color: var(--ink);
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: grid; place-items: center; padding: 24px 16px;
+  }
+  .stage { width: min(380px, 100%); position: relative; padding-top: 62px; }
+
+  /* speech bubble */
+  .bubble {
+    position: absolute; top: 0; left: 50%; z-index: 3;
+    width: max-content; max-width: 100%;
+    transform: translateX(-50%) scale(.7); transform-origin: 50% 100%; opacity: 0;
+    padding: 9px 14px; border: 1.5px solid var(--blue); border-radius: 14px; background: #fff;
+    font-size: .9rem; font-weight: 500; text-align: center; color: var(--blue-dark);
+    transition: opacity .2s, transform .25s cubic-bezier(.3, 1.4, .5, 1);
+    pointer-events: none;
+  }
+  .bubble::after {
+    content: ""; position: absolute; left: 50%; bottom: -7px; width: 12px; height: 12px;
+    background: #fff; border: solid var(--blue); border-width: 0 1.5px 1.5px 0;
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .talking .bubble { opacity: 1; transform: translateX(-50%) scale(1); }
+
+  /* character */
+  .guy { display: block; width: 220px; margin: 0 auto -30px; position: relative; z-index: 1; overflow: visible; }
+  .guy .tf { transform-box: fill-box; }
+  .body { animation: bob 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom; }
+  @keyframes bob { 50% { transform: translateY(-3px); } }
+  .ball { transform-origin: 110px 40px; animation: wobble 2.4s ease-in-out infinite; }
+  @keyframes wobble { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+
+  .pupils { transition: transform .8s ease-in-out; }
+  .lid { transform-box: fill-box; transform-origin: top; transform: scaleY(0); transition: transform .35s cubic-bezier(.3, 1.3, .5, 1); }
+  .blink .lid { transform: scaleY(1); transition-duration: .07s; }
+  .hand { transition: transform .35s cubic-bezier(.3, 1.3, .5, 1); }
+  .shy .lid { transform: scaleY(1); }
+  .shy .hand { transform: translateY(-80px); }
+  .shy .pupils { transform: translate(0, 0) !important; }
+
+  .brows { transition: transform .2s; }
+  .talking .brows { transform: translateY(-5px); }
+  .smile { transition: opacity .1s; }
+  .talking .smile { opacity: 0; }
+  .mouth { transform-box: fill-box; transform-origin: center; transform: scaleY(0); }
+  .talking .mouth { animation: yap .24s ease-in-out infinite alternate; }
+  @keyframes yap { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+  .arm-l, .arm-r { transform-box: fill-box; transform-origin: top center; }
+  .talking .arm-l { animation: wave-l .5s ease-in-out infinite alternate; }
+  .talking .arm-r { animation: wave-r .5s ease-in-out .15s infinite alternate; }
+  @keyframes wave-l { from { transform: rotate(8deg); } to { transform: rotate(-22deg); } }
+  @keyframes wave-r { from { transform: rotate(-8deg); } to { transform: rotate(22deg); } }
+
+  /* form */
+  .card {
+    position: relative; z-index: 2; background: #fff;
+    border: 1.5px solid var(--line); border-radius: 18px; padding: 28px 26px 26px;
+  }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; font-weight: 700; }
+  .sub { margin: 0 0 22px; color: var(--muted); font-size: .95rem; }
+  label { display: block; font-size: .85rem; font-weight: 500; margin: 14px 0 6px; }
+  input {
+    width: 100%; font: inherit; color: var(--ink); padding: 12px 14px;
+    border: 1.5px solid var(--line); border-radius: 10px; background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59, 108, 240, .18); }
+  button {
+    width: 100%; margin-top: 22px; padding: 13px; font: inherit; font-weight: 700;
+    color: #fff; background: var(--blue); border: 0; border-radius: 10px; cursor: pointer; transition: background .15s;
+  }
+  button:hover { background: var(--blue-dark); }
+  button:focus-visible { outline: 3px solid rgba(59, 108, 240, .4); outline-offset: 2px; }
+  .msg { min-height: 1.2em; margin: 14px 0 0; font-size: .9rem; text-align: center; color: var(--muted); }
+  .msg.err { color: #c0392b; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .body, .ball, .talking .mouth, .talking .arm-l, .talking .arm-r { animation: none; }
+    .pupils, .lid, .hand, .bubble { transition: none; }
+  }
+</style>
+</head>
+<!-- HTML: page content -->
+<body>
+  <main class="stage" id="stage">
+    <div class="bubble" id="bubble" aria-hidden="true"></div>
+
+    <svg class="guy" viewBox="0 0 220 170" role="img" aria-label="A friendly blue character that looks around, talks nonsense while you type, and covers its eyes when you type your password">
+      <g class="body">
+        <!-- antenna -->
+        <line x1="110" y1="42" x2="110" y2="16" stroke="#2a52c9" stroke-width="4" stroke-linecap="round"/>
+        <g class="ball"><circle cx="110" cy="11" r="7" fill="#2a52c9"/><circle cx="108" cy="9" r="2" fill="#8fb0ff"/></g>
+        <!-- ears -->
+        <circle cx="34" cy="104" r="10" fill="#2a52c9"/>
+        <circle cx="186" cy="104" r="10" fill="#2a52c9"/>
+        <!-- side arms -->
+        <ellipse class="arm-l" cx="26" cy="142" rx="9" ry="22" fill="#3b6cf0" transform="rotate(12 26 142)"/>
+        <ellipse class="arm-r" cx="194" cy="142" rx="9" ry="22" fill="#3b6cf0" transform="rotate(-12 194 142)"/>
+        <!-- body + head -->
+        <path d="M35 170 V96 C35 60 68 40 110 40 C152 40 185 60 185 96 V170 Z" fill="#3b6cf0"/>
+        <!-- belly patch -->
+        <ellipse cx="110" cy="168" rx="38" ry="14" fill="#6f95ff" opacity=".55"/>
+        <!-- cheeks -->
+        <ellipse cx="60" cy="118" rx="9" ry="6" fill="#9db9ff" opacity=".8"/>
+        <ellipse cx="160" cy="118" rx="9" ry="6" fill="#9db9ff" opacity=".8"/>
+        <!-- eyes -->
+        <circle cx="80" cy="92" r="20" fill="#fff"/>
+        <circle cx="140" cy="92" r="20" fill="#fff"/>
+        <g class="pupils" id="pupils">
+          <circle cx="80" cy="92" r="9" fill="#14213d"/>
+          <circle cx="140" cy="92" r="9" fill="#14213d"/>
+          <circle cx="83.5" cy="88.5" r="3" fill="#fff"/>
+          <circle cx="143.5" cy="88.5" r="3" fill="#fff"/>
+        </g>
+        <!-- brows -->
+        <g class="brows" stroke="#14213d" stroke-width="3.5" stroke-linecap="round" fill="none">
+          <path d="M64 64 Q80 56 96 64"/>
+          <path d="M124 64 Q140 56 156 64"/>
+        </g>
+        <!-- eyelids (same blue as the face) -->
+        <rect class="lid" x="56" y="70" width="48" height="46" rx="8" fill="#3b6cf0"/>
+        <rect class="lid" x="116" y="70" width="48" height="46" rx="8" fill="#3b6cf0"/>
+        <!-- mouth -->
+        <path class="smile" d="M96 122 Q110 134 124 122" fill="none" stroke="#14213d" stroke-width="3.5" stroke-linecap="round"/>
+        <g class="mouth"><ellipse cx="110" cy="127" rx="11" ry="9" fill="#14213d"/><ellipse cx="110" cy="132" rx="6" ry="3.5" fill="#ff7a8a"/></g>
+        <!-- covering hands -->
+        <ellipse class="hand" cx="80" cy="170" rx="27" ry="19" fill="#2a52c9"/>
+        <ellipse class="hand" cx="140" cy="170" rx="27" ry="19" fill="#2a52c9"/>
+      </g>
+    </svg>
+
+    <form class="card" id="form" novalidate>
+      <h1>Welcome back</h1>
+      <p class="sub">Sign in to continue.</p>
+      <label for="user">Email or username</label>
+      <input id="user" name="user" type="text" autocomplete="username" placeholder="you@example.com">
+      <label for="pass">Password</label>
+      <input id="pass" name="pass" type="password" autocomplete="current-password" placeholder="Your password">
+      <button type="submit">Sign in</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+  </main>
+
+<!-- JavaScript: page behavior -->
+<script>
+  const stage = document.getElementById('stage');
+  const user = document.getElementById('user');
+  const pass = document.getElementById('pass');
+  const pupils = document.getElementById('pupils');
+  const bubble = document.getElementById('bubble');
+  const msg = document.getElementById('msg');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- nonsense ----
+  const talkUser = [
+    'Glorp! The fnord is sideways.', 'My elbow owes me soup.', 'Seventeen ducks agree with Thursday.',
+    'Bleep! The moon is wearing socks.', 'Pickle, pickle, wardrobe!', 'I licked a cloud once. Salty.',
+    'Doorknobs dream in triangles.', 'Zibble zabble, hello left shoe.'
+  ];
+  const talkPass = [
+    'The carpet is plotting something.', 'Mmm, spaghetti has no knees.', 'Blub blub, I am a lamp!',
+    'Nobody tell the kettle.', 'Crunch the wobbly algebra!', 'My nose is full of Wednesday.',
+    'Shh, the soup is listening.', 'La la la, I see nothing, I’m a potato!'
+  ];
+  let lastLine = '', hideTimer = 0, keyCount = 0;
+  function pick(list) {
+    let s; do { s = list[Math.floor(Math.random() * list.length)]; } while (s === lastLine && list.length > 1);
+    lastLine = s; return s;
+  }
+  function say(list) {
+    bubble.textContent = pick(list);
+    stage.classList.add('talking');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => stage.classList.remove('talking'), 2200);
+  }
+  let lastSpoke = 0, activeList = null;
+  function typed(list) {          // only now and then, at a random moment
+    activeList = list;
+    if (Date.now() - lastSpoke > 7000 && Math.random() < 0.12) { lastSpoke = Date.now(); say(list); }
+  }
+  setInterval(() => {             // also pipes up by himself once in a while
+    if (activeList && Date.now() - lastSpoke > 8000 && Math.random() < 0.3) { lastSpoke = Date.now(); say(activeList); }
+  }, 2000);
+
+  // ---- eyes ----
+  let following = false;
+  function lookAtField() {
+    const pos = user.selectionStart == null ? user.value.length : user.selectionStart;
+    const x = -8 + Math.min(pos / 26, 1) * 16;
+    pupils.style.transform = 'translate(' + x + 'px, 5px)';
+  }
+  const spots = [[-9, 0], [9, 0], [-5, -4], [6, -3], [0, 0], [-9, 3], [9, 3], [0, -5]];
+  setInterval(() => {            // wander left and right when not busy
+    if (following || stage.classList.contains('shy') || calm) return;
+    const [x, y] = spots[Math.floor(Math.random() * spots.length)];
+    pupils.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  }, 3000);
+
+  (function blinkLoop() {
+    setTimeout(() => {
+      if (!stage.classList.contains('shy')) {
+        stage.classList.add('blink');
+        setTimeout(() => stage.classList.remove('blink'), 140);
+      }
+      blinkLoop();
+    }, 2500 + Math.random() * 2500);
+  })();
+
+  // ---- events ----
+  user.addEventListener('focus', () => { stage.classList.remove('shy'); following = true; keyCount = 0; lookAtField(); activeList = talkUser; });
+  ['input', 'keyup', 'click', 'select'].forEach(e => user.addEventListener(e, lookAtField));
+  user.addEventListener('input', () => typed(talkUser));
+  user.addEventListener('blur', () => { following = false; activeList = null; });
+
+  pass.addEventListener('focus', () => { stage.classList.add('shy'); following = false; keyCount = 0; activeList = talkPass; });
+  pass.addEventListener('input', () => typed(talkPass));
+  pass.addEventListener('blur', () => { stage.classList.remove('shy'); activeList = null; });
+
+  document.getElementById('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    stage.classList.remove('shy');
+    if (!user.value.trim() || !pass.value) {
+      msg.className = 'msg err';
+      msg.textContent = 'Enter your email or username and your password.';
+      return;
+    }
+    msg.className = 'msg';
+    msg.textContent = 'Signed in (demo only, nothing was sent).';
+    say(['Yay! Zoop zoop!', 'Welcome, human!']);
+  });
+</script>
+</body>
+</html>

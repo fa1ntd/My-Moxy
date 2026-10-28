@@ -1,0 +1,665 @@
+/* Theme colors used across the page. The checked theme radio changes these
+   variables, so backgrounds, text, chat bubbles, and buttons update together. */
+
+:root {
+  --bg: #eef5ff;
+  --text: #102a4c;
+  --muted: #526b89;
+  --bot: #dceaff;
+  --user: #c5dcff;
+  --brand: #0756b3;
+  --brand-contrast: #ffffff;
+}
+
+body:has(#theme-dark:checked) {
+  --bg: #111827;
+  --text: #f3f4f6;
+  --muted: #a1a1aa;
+  --bot: #1f2937;
+  --user: #263449;
+  --brand: #8ab4f8;
+  --brand-contrast: #10213a;
+}
+
+body:has(#theme-strawberry:checked) {
+  --bg: #fff0f5;
+  --text: #47202f;
+  --muted: #946174;
+  --bot: #ffd9e7;
+  --user: #f8c3d8;
+  --brand: #d41467;
+  --brand-contrast: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Set the page's default font, theme colors, and full-screen column layout.
+   The global reset keeps sizing and spacing predictable across elements. */
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible, button:focus-visible, label:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* Give keyboard users a visible outline when they focus links, buttons, or
+   labels using the keyboard. */
+
+/* Lay out the top navigation, brand, and links. On smaller screens the media
+   query reduces spacing so the navigation fits more comfortably. */
+
+nav {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+}
+
+.brand-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.brand {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 600;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.links a:hover {
+  color: var(--brand);
+  background: var(--bot);
+}
+
+.links a:active {
+  transform: translateY(1px);
+}
+
+.links .signup-link {
+  margin-left: 4px;
+  padding: 9px 18px;
+  background: var(--brand);
+  color: var(--brand-contrast);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+.links .signup-link:hover {
+  background: var(--brand);
+  color: var(--brand-contrast);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+  nav {
+    padding: 12px 14px;
+  }
+  .links {
+    gap: 2px;
+    font-size: 0.82rem;
+  }
+  .links a {
+    min-height: 36px;
+    padding: 8px;
+  }
+  .links .signup-link {
+    margin-left: 2px;
+    padding: 8px 12px;
+  }
+}
+
+/* Center the main heading and chat on the page. The is-expanded state hides
+   the heading and lets the chat use the available page height. */
+
+main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+}
+
+main h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+main.is-expanded {
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 12px 24px;
+}
+
+main.is-expanded h1 {
+  display: none;
+}
+
+.chat-layout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 620px);
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+main.settings-open .chat-layout {
+  transform: translateX(25px);
+}
+
+main.is-expanded .chat-layout {
+  align-items: stretch;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* Style the settings control and its expandable menu. Theme radio buttons
+   are visually hidden, while their labels show selectable theme swatches. */
+
+.settings-button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  list-style: none;
+  cursor: pointer;
+}
+
+.settings-button::-webkit-details-marker, .settings-option::-webkit-details-marker {
+  display: none;
+}
+
+.settings-button::marker, .settings-option::marker {
+  content: "";
+}
+
+.settings-button:hover {
+  color: var(--brand);
+}
+
+.settings-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.settings-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 4;
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.16);
+}
+
+.settings-details[open] > .settings-menu {
+  display: grid;
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.settings-option:hover {
+  background: var(--bot);
+}
+
+.themes-details {
+  width: 100%;
+}
+
+.submenu-arrow {
+  margin-left: auto;
+}
+
+.themes-details[open] .submenu-arrow {
+  transform: rotate(90deg);
+}
+
+.settings-menu .menu-divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--bot);
+}
+
+.theme-options {
+  display: none;
+  gap: 2px;
+  padding-left: 12px;
+}
+
+.themes-details[open] .theme-options {
+  display: grid;
+}
+
+.theme-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.settings-menu .theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.settings-menu .theme-option:hover {
+  background: var(--bot);
+}
+
+.theme-radio:focus-visible + .theme-option {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.theme-swatch {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 2px var(--bg), 0 0 0 1px var(--muted);
+}
+
+.dark-swatch {
+  --swatch: #1f2937;
+}
+
+.platinum-swatch {
+  --swatch: linear-gradient(135deg, #0756b3 50%, #ffffff 50%);
+}
+
+.strawberry-swatch {
+  --swatch: linear-gradient(135deg, #d41467 50%, #f8c3d8 50%);
+}
+
+.theme-radio:checked + .theme-option::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--brand);
+}
+
+.settings-menu .signout-option {
+  color: #b42318;
+}
+
+/* Shift the chat slightly when the settings menu is open, and adjust modal
+   backdrops for the dark and strawberry themes. */
+nav:has(.settings-details[open]) + main .chat-layout {
+  transform: translateX(25px);
+}
+
+body:has(#theme-dark:checked) .modal {
+  background: rgba(17, 24, 39, 0.88);
+}
+
+body:has(#theme-strawberry:checked) .modal {
+  background: rgba(255, 240, 245, 0.9);
+}
+
+/* Keep the conversation history collapsed by default. When the chat is
+   expanded, show a scrollable message area and distinguish bot/user bubbles. */
+
+.chat {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 560px;
+  border-radius: 16px;
+  background: var(--bg);
+  outline: none;
+}
+
+.chat.is-expanded {
+  flex: 1;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  height: 0;
+  opacity: 0;
+  overflow-y: auto;
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: height 0.25s ease, opacity 0.25s ease, padding 0.25s ease;
+}
+
+.chat.is-expanded .messages {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  opacity: 1;
+  padding: 18px;
+}
+
+.msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.bot {
+  align-self: flex-start;
+  background: var(--bot);
+}
+
+.user {
+  align-self: flex-end;
+  background: var(--user);
+}
+
+/* Arrange the message composer. The plus control opens the attachment menu;
+   the menu is hidden again when the chat loses focus. File inputs stay hidden
+   because the visible menu labels trigger them. */
+
+.composer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.toggle {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.plus {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.plus:hover {
+  color: var(--text);
+}
+
+.toggle:checked ~ .plus {
+  transform: rotate(45deg);
+  color: var(--text);
+}
+
+.toggle:focus-visible ~ .plus {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.menu {
+  display: none;
+  position: absolute;
+  left: 14px;
+  bottom: 62px;
+  min-width: 190px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  z-index: 2;
+}
+
+.toggle:checked ~ .menu {
+  display: block;
+}
+
+.chat:not(:focus-within) .menu {
+  display: none;
+}
+
+.menu label {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.menu label:hover {
+  background: var(--bot);
+}
+
+.menu input[type="file"] {
+  display: none;
+}
+
+/* Let the message field take the remaining composer width and style the voice
+   control. The screen-reader-only status remains available to assistive tech. */
+
+.composer input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.composer input[type="text"]:focus {
+  outline: none;
+}
+
+.voice-button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.voice-button:hover, .voice-button[aria-pressed="true"] {
+  color: var(--brand);
+}
+
+.voice-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+button {
+  flex: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Show a dialog only when its matching #id is targeted in the URL. The
+   backdrop fills the screen, and the card contains the dialog content and form. */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  place-items: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 5;
+}
+
+.modal:target {
+  display: grid;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 28px 24px;
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+
+.card p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.card label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.card input {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card button {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.close:hover {
+  color: var(--text);
+}
+
+/* Turn off transitions for visitors who have requested reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
